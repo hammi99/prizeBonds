@@ -36,4 +36,4 @@ class Parser {
     }
 }
 
-export default new Parser()
+module.exports = new Parser()
