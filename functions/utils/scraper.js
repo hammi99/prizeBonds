@@ -8,9 +8,27 @@ class Scraper {
     
     rootUrl = 'https://savings.gov.pk/download-draws/'
 
+    async scrapeWebsite(){
+        let r
+        r = await this.scrapeDenominationsListingPage()
+        r = r.map(this.scrapeDrawsListingPage)
+        r = await Promise.all(r)
+        r = [].concat(...r)
+        r = r.map(this.scrapeDrawPage)
+        r = await Promise.all(r)
+        return r
+    }
+    async getDrawUrls(){
+        return await this
+            .scrapeDenominationsListingPage()
+            .then(e => e.map(this.scrapeDrawsListingPage))
+            .then(e => Promise.all(e))
+            .then(e => [].concat(...e))
+    }
     async scrapeDenominationsListingPage(){
-        const {data} = await axios.get(this.rootUrl);
-        const $      = cheerio.load(data);
+        // https://savings.gov.pk/download-draws/
+        const {data} = await axios.get(this.rootUrl)
+        const $      = cheerio.load(data)
         return $('option')
             .toArray()
             .map   (e => $(e).attr('value') )
@@ -26,9 +44,11 @@ class Scraper {
     }
     async scrapeDrawPage(url){
         // sample page https://savings.gov.pk/wp-content/uploads/2017/03/15-02-2013Rs.100.txt
-        const d = await axios.get(url);
-        const s = cheerio.load(d.data)('body').html();
+        const d = await axios.get(url)
+        const s = cheerio.load(d.data)('body').html()
         return {
+            url         : url,
+            rawText     : s,
             date        : parser.parseDate(s),
             location    : parser.parseLocation(s),
             drawNo      : parser.numberAfter(s,'draw no'),
