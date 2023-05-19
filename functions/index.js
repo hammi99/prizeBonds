@@ -5,7 +5,7 @@ const
 
 const
     app = firebase.initializeApp(),
-    ft  = app.firestore(),
+    fs  = app.firestore(),
     db  = app.database()
 
 // TODO

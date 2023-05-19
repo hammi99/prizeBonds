@@ -3,6 +3,25 @@ axios   = require('axios'),
 cheerio = require('cheerio'),
 parser  = require('./parser')
 
+class Scraper {
+    url = 'https://savings.gov.pk/latest/results.php'
+    
+    async scrape(){
+        let response = await axios.post(
+            'https://savings.gov.pk/latest/results.php', 
+            querystring.stringify({
+                country       : '1',
+                state         : 'all',
+                range_from    : '000000',
+                range_to      : '000100',
+                pb_number_list: '',
+                btnsearch     : 'Search'
+            })
+        )
+        let $ = cheerio.load(response.data)
+
+    }
+}
 
 class Scraper {
     
